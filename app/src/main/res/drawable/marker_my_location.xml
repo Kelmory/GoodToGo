@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:gravity="center">
+        <shape android:shape="oval" >
+            <size
+                android:width="40dp"
+                android:height="40dp"/>
+            <solid
+                android:color="@color/colorMyLocation" />
+            <stroke
+                android:color="@color/colorMyLocationGrey"
+                android:width="3dp"/>
+        </shape>
+    </item>
+</selector>

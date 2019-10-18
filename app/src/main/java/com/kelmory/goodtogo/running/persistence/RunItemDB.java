@@ -1,4 +1,4 @@
-package com.kelmory.goodtogo.utils.persistence;
+package com.kelmory.goodtogo.running.persistence;
 
 import android.content.Context;
 
@@ -11,7 +11,7 @@ public abstract class RunItemDB extends RoomDatabase {
     private static final String DATABASE_NAME = "runitem_db";
     private static RunItemDB DB_INSTANCE;
 
-    public abstract RunItemDAO toDoItemDao();
+    public abstract RunItemDAO runItemDAO();
 
     public static RunItemDB getDatabase(Context context) {
         if (DB_INSTANCE == null) {

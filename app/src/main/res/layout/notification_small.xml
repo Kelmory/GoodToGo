@@ -50,6 +50,7 @@
 
     </LinearLayout>
 
+    <!--
     <LinearLayout
         android:id="@+id/linearLayout3"
         android:layout_width="0dp"
@@ -89,4 +90,6 @@
             android:tint="@color/colorPrimary" />
 
     </LinearLayout>
+    -->
+
 </androidx.constraintlayout.widget.ConstraintLayout>

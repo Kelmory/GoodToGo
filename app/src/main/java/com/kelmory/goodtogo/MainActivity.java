@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -18,10 +19,15 @@ import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.kelmory.goodtogo.musicPlayer.MusicFragment;
+import com.kelmory.goodtogo.running.RunningIntentService;
+import com.kelmory.goodtogo.running.RunningManager;
 import com.kelmory.goodtogo.utils.AndroidLocationService;
 import com.kelmory.goodtogo.utils.PermissionManager;
+
+import java.util.LinkedList;
 
 public class MainActivity extends AppCompatActivity
         implements OnMapReadyCallback {
@@ -67,11 +73,12 @@ public class MainActivity extends AppCompatActivity
         floatingRunButton.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                Toast.makeText(MainActivity.this,
-                        "Start running recording",
-                        Toast.LENGTH_LONG)
-                        .show();
-
+                if(!RunningManager.isStarted()) {
+                    RunningIntentService.startActionStart(MainActivity.this);
+                }
+                else{
+                    RunningIntentService.startActionStop(MainActivity.this);
+                }
                 return false;
             }
         });
@@ -90,8 +97,18 @@ public class MainActivity extends AppCompatActivity
                 LatLng position = new LatLng(mLocation.getLatitude(), mLocation.getLongitude());
                 mMap.clear();
                 mMap.addMarker(new MarkerOptions()
-                        .icon(bitmapDescriptorFromVector(context))
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_location))
                         .position(position));
+
+                if(RunningManager.isStarted()){
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(position, 18.0f));
+
+                    LinkedList<LatLng> route = RunningManager.getRoute();
+                    if(route != null && !route.isEmpty()){
+                        mMap.addPolyline(new PolylineOptions()
+                                .addAll(route));
+                    }
+                }
             }
         });
     }
@@ -102,7 +119,7 @@ public class MainActivity extends AppCompatActivity
             permissionManager.requestPermissionForExternalStorage();
         }
         else {
-            MusicFragment musicPlayer = MusicFragment.newInstance();
+            MusicFragment.newInstance();
         }
     }
 
@@ -124,14 +141,6 @@ public class MainActivity extends AppCompatActivity
         // Add a marker in Sydney and move the camera
         LatLng sydney = new LatLng(-33.908, 151.211);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney, 13.5f));
-    }
-
-
-    private BitmapDescriptor bitmapDescriptorFromVector(Context context) {
-        Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(),
-                R.drawable.marker_location);
-
-        return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
 
 }

@@ -230,11 +230,14 @@ public class MusicFragment extends Fragment {
             public void run() {
                 int duration = mediaPlayer.getCurrentPosition() / 1000;
 
-                textViewProgress.setText(String.format("%s/%s",
-                        MusicItem.formatPlayTime(duration),
-                        musicPlaying.getDurationStr()));
-                seekBarProgress.setProgress(duration);
-
+                if(textViewProgress != null) {
+                    textViewProgress.setText(String.format("%s/%s",
+                            MusicItem.formatPlayTime(duration),
+                            musicPlaying.getDurationStr()));
+                }
+                if(seekBarProgress != null) {
+                    seekBarProgress.setProgress(duration);
+                }
                 mSeekBarHandler.postDelayed(this, 50);
             }
         };

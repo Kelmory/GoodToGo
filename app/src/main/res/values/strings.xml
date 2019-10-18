@@ -13,4 +13,6 @@
     <string name="music_set">MUSIC_SET</string>
     <string name="single_music_to_play">SINGLE_VALUE_TO_PLAY</string>
     <string name="str_music_position">MUSIC_POSITION</string>
+    <string name="channel_name">Running Status</string>
+    <string name="channel_description">Running notification channel</string>
 </resources>

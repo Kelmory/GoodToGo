@@ -1,4 +1,4 @@
-package com.kelmory.goodtogo;
+package com.kelmory.goodtogo.functions;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;

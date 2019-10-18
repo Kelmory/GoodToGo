@@ -1,4 +1,4 @@
-package com.kelmory.goodtogo.utils.persistence;
+package com.kelmory.goodtogo.running.persistence;
 
 import androidx.room.Dao;
 import androidx.room.Delete;

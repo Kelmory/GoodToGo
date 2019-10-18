@@ -1,4 +1,4 @@
-package com.kelmory.goodtogo.utils.persistence;
+package com.kelmory.goodtogo.running.persistence;
 
 import android.icu.util.Calendar;
 
@@ -96,6 +96,10 @@ public class RunTableItem {
 
     public static double calcDistance(LinkedList<LatLng> list){
         double dist = 0.0;
+
+        if(list.isEmpty() || list.size() == 1)
+            return dist;
+
         LatLng start = list.get(0);
         for(LatLng next: list.subList(1, list.size() - 1)){
             dist += DistanceComputation.GetDistance(start, next);

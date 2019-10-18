@@ -4,32 +4,32 @@ import android.content.ContentResolver;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.provider.MediaStore;
 import android.util.Log;
-
-import androidx.annotation.RequiresApi;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class MusicAccess {
+class MusicAccess {
 
-    private static final String[] projection = {
-            MediaStore.Audio.Media.TITLE,
-            MediaStore.Audio.Media.DATA,
-    };
+    public interface OnScanCompleteListener{
+        void onScanComplete(ArrayList<MusicItem> list);
+    }
 
-    public static void getMusic(final ArrayList<MusicItem> musics, final ContentResolver resolver){
+    static void getMusic(final ContentResolver resolver,
+                         final OnScanCompleteListener listener){
         try {
             new AsyncTask<Void, Void, Void>() {
+
+                OnScanCompleteListener mListener;
+
                 @Override
                 protected Void doInBackground(Void... voids) {
                     // Set Uri to be external content uri
                     Uri collection = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
                     // Init a cursor with a query
                     Cursor cursor = resolver.query(collection,
-                            projection,
+                            null,
                             null,
                             null,
                             null);
@@ -40,6 +40,8 @@ public class MusicAccess {
                     }
 
                     // Else iterate cursor to record paths
+                    ArrayList<MusicItem> musics = new ArrayList<>();
+
                     while(cursor.moveToNext()){
                         String path = cursor.getString(
                                 cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
@@ -51,6 +53,8 @@ public class MusicAccess {
                     // Close cursor after use
                     cursor.close();
 
+                    mListener = listener;
+                    mListener.onScanComplete(musics);
                     return null;
                 }
             }.execute();
@@ -58,6 +62,5 @@ public class MusicAccess {
             Log.e("MusicAccess", Arrays.toString(e.getStackTrace()));
         }
     }
-
 }
 

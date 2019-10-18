@@ -1,7 +1,7 @@
 package com.kelmory.goodtogo.musicPlayer;
 
 import android.app.Activity;
-import android.hardware.display.DisplayManager;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
@@ -12,16 +12,25 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.kelmory.goodtogo.MainActivity;
 import com.kelmory.goodtogo.R;
 
 import java.util.ArrayList;
 
 public class MusicListPopupActivity extends Activity {
 
-    private RecyclerView recyclerView;
-    private MusicAdapter musicAdapter;
+    public interface onMusicPositionSetListener{
+        void onMusicPositionSet(int position);
+    }
+
+    private static onMusicPositionSetListener musicPositionSetListener;
+
+    public static void setMusicPositionSetListener(onMusicPositionSetListener listener) {
+        musicPositionSetListener = listener;
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -36,28 +45,53 @@ public class MusicListPopupActivity extends Activity {
 
         getWindow().setLayout(width, height);
 
-        ArrayList<MusicItem> musics = (ArrayList<MusicItem>)getIntent()
-                .getSerializableExtra(getResources().getString(R.string.music_set));
+        ArrayList<MusicItem> musics = getIntent().getParcelableArrayListExtra(getResources().getString(R.string.music_set));
 
-        recyclerView = (RecyclerView) findViewById(R.id.recyclerview_music_list);
-        musicAdapter = new MusicAdapter();
+        RecyclerView recyclerView = findViewById(R.id.recyclerview_music_list);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
+
+        MusicAdapter musicAdapter = new MusicAdapter();
         musicAdapter.setMusicItems(musics);
+        musicAdapter.setOnItemClickListener(new MusicAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+                Intent data = new Intent();
+                data.putExtra(getResources().getString(R.string.str_music_position), position);
+                setResult(RESULT_OK, data);
+                finish();
+            }
+        });
+
         recyclerView.setAdapter(musicAdapter);
+
+        musicAdapter.notifyDataSetChanged();
     }
 }
 
 class MusicAdapter extends RecyclerView.Adapter {
 
     private ArrayList<MusicItem> musicItems;
+    private OnItemClickListener mListener;
 
     public static class MusicViewHolder extends RecyclerView.ViewHolder{
         private TextView textViewFileName;
         private TextView textViewMusicDuration;
 
-        public MusicViewHolder(@NonNull View itemView) {
+        MusicViewHolder(@NonNull View itemView) {
             super(itemView);
             textViewFileName = (TextView)itemView.findViewById(R.id.textview_list_file_name);
             textViewMusicDuration = (TextView)itemView.findViewById(R.id.textview_list_duration);
+        }
+
+        void bind(final int position,
+                  final OnItemClickListener mListener) {
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mListener.onItemClick(position);
+                }
+            });
         }
     }
 
@@ -76,14 +110,27 @@ class MusicAdapter extends RecyclerView.Adapter {
         MusicItem item = musicItems.get(position);
         ((MusicViewHolder) holder).textViewFileName.setText(item.getName());
         ((MusicViewHolder) holder).textViewMusicDuration.setText(item.getDurationStr());
+        ((MusicViewHolder) holder).bind(position, mListener);
     }
 
     @Override
     public int getItemCount() {
-        return musicItems.size();
+        if(musicItems == null)
+            return 0;
+        else
+            return musicItems.size();
     }
 
-    public void setMusicItems(ArrayList<MusicItem> musicItems) {
+    void setMusicItems(ArrayList<MusicItem> musicItems) {
         this.musicItems = musicItems;
     }
+
+    public interface OnItemClickListener{
+        void onItemClick(int position);
+    }
+
+    void setOnItemClickListener(OnItemClickListener listener){
+        mListener = listener;
+    }
+
 }

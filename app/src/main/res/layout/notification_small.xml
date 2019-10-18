@@ -73,7 +73,7 @@
             android:textSize="18sp" />
 
         <ImageButton
-            android:id="@+id/button_play_pause"
+            android:id="@+id/button_notify_play_pause"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"

@@ -1,39 +1,79 @@
 package com.kelmory.goodtogo.musicPlayer;
 
-import android.content.ContentResolver;
+import android.media.MediaMetadataRetriever;
+import android.os.Parcel;
+import android.os.Parcelable;
 
-import java.io.FileDescriptor;
 import java.util.Locale;
 
-class MusicItem {
+class MusicItem implements Parcelable {
     private String mName;
     private String mPath;
     private int mDuration;
 
-    public MusicItem(String path, String name) {
+    MusicItem(String path, String name) {
         mPath = path;
         mName = name;
+
+        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+        retriever.setDataSource(mPath);
+        String duration = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+        mDuration = Integer.parseInt(duration) / 1000;
     }
+
+    private MusicItem(Parcel in) {
+        mName = in.readString();
+        mPath = in.readString();
+        mDuration = in.readInt();
+    }
+
+    public static final Creator<MusicItem> CREATOR = new Creator<MusicItem>() {
+        @Override
+        public MusicItem createFromParcel(Parcel in) {
+            return new MusicItem(in);
+        }
+
+        @Override
+        public MusicItem[] newArray(int size) {
+            return new MusicItem[size];
+        }
+    };
 
     public void setDuration(int mDuration) {
         this.mDuration = mDuration;
     }
 
-    public int getDuration() {
+    int getDuration() {
         return mDuration;
     }
 
-    public String getDurationStr(){
-        int min = mDuration / 60;
-        int sec = mDuration % 60;
-        return String.format(Locale.ENGLISH, "%d/%d", min, sec);
+    String getDurationStr(){
+        return formatPlayTime(mDuration);
     }
 
-    public String getPath(){
+    String getPath(){
         return mPath;
     }
 
     public String getName() {
         return mName;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(mName);
+        dest.writeString(mPath);
+        dest.writeInt(mDuration);
+    }
+
+    static String formatPlayTime(int duration){
+        int min = duration / 60;
+        int sec = duration % 60;
+        return String.format(Locale.ENGLISH, "%02d:%02d", min, sec);
     }
 }

@@ -30,8 +30,6 @@ public class MainActivity extends AppCompatActivity
     private Location mLocation;
     private AndroidLocationService locationService;
 
-    private MusicFragment musicPlayer;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -104,7 +102,7 @@ public class MainActivity extends AppCompatActivity
             permissionManager.requestPermissionForExternalStorage();
         }
         else {
-            musicPlayer = MusicFragment.newInstance();
+            MusicFragment musicPlayer = MusicFragment.newInstance();
         }
     }
 

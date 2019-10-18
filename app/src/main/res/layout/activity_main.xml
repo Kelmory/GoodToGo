@@ -18,6 +18,17 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/floatingActionButton"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_margin="24dp"
+        android:tint="@android:color/white"
+        app:backgroundTint="@color/colorPrimary"
+        app:layout_constraintBottom_toTopOf="@+id/floatbutton_run"
+        app:layout_constraintEnd_toEndOf="@+id/fragment_map"
+        app:srcCompat="@drawable/ic_timer_black_48dp" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/floatbutton_run"
         android:layout_width="60dp"
         android:layout_height="60dp"

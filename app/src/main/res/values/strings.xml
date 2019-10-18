@@ -11,4 +11,6 @@
     <string name="tab_text_2">Tab 2</string>
     <string name="music_path">GET_MUSIC_PATH</string>
     <string name="music_set">MUSIC_SET</string>
+    <string name="single_music_to_play">SINGLE_VALUE_TO_PLAY</string>
+    <string name="str_music_position">MUSIC_POSITION</string>
 </resources>

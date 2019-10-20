@@ -1,4 +1,4 @@
-package com.kelmory.goodtogo.running.persistence;
+package com.kelmory.goodtogo.utils.persistence;
 
 import android.icu.util.Calendar;
 
@@ -75,7 +75,7 @@ public class RunTableItem {
         String route = "";
         if(!routeLatLng.isEmpty()){
             for(LatLng node: routeLatLng){
-                String add = String.format(Locale.ENGLISH,"%.6f-%.6f;", node.latitude, node.longitude);
+                String add = String.format(Locale.ENGLISH,"%.8f-%.8f;", node.latitude, node.longitude);
                 route = route.concat(add);
             }
         }

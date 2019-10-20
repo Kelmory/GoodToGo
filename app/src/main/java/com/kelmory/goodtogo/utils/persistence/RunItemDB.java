@@ -1,4 +1,4 @@
-package com.kelmory.goodtogo.running.persistence;
+package com.kelmory.goodtogo.utils.persistence;
 
 import android.content.Context;
 

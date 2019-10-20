@@ -4,11 +4,9 @@ import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.Intent;
 import android.content.Context;
-import android.content.res.Resources;
-import android.graphics.BitmapFactory;
+import android.content.Intent;
+import android.location.Location;
 import android.os.Build;
 import android.util.Log;
 import android.widget.RemoteViews;
@@ -17,9 +15,9 @@ import android.widget.Toast;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.kelmory.goodtogo.MainActivity;
+import com.google.android.gms.maps.model.LatLng;
 import com.kelmory.goodtogo.R;
+import com.kelmory.goodtogo.utils.AndroidLocationService;
 
 import java.util.Arrays;
 
@@ -27,7 +25,6 @@ public class RunningIntentService extends IntentService {
 
     private static final String TAG = RunningIntentService.class.getSimpleName();
 
-    private static final int NOTIFY_REQUEST_CODE = 46;
     private static final int NOTIFICATION_ID = 975;
 
     private static final String ACTION_START_RUN =
@@ -37,11 +34,8 @@ public class RunningIntentService extends IntentService {
 
     private static final String CHANNEL_ID = "com.kelmory.goodtogo.running.notify.RUN_CHANNEL";
 
-    private RunningManager runningManager;
     private NotificationManager notificationManager;
-    private NotificationManagerCompat notificationManagerCompat;
 
-    private static boolean stop = false;
     // Extra parameters names
 
     public RunningIntentService() {
@@ -85,7 +79,16 @@ public class RunningIntentService extends IntentService {
     }
 
     private void handleActionStart() {
-        runningManager.startRunning();
+        final AndroidLocationService locationService = new AndroidLocationService(this);
+        locationService.setLocationListener(new AndroidLocationService.OnLocationGetCallback() {
+            @Override
+            public void onLocationGet(Location location) {
+                LatLng position = new LatLng(location.getLatitude(), location.getLongitude());
+                RunningManager.addRoutePoint(position);
+            }
+        });
+        locationService.startService();
+        RunningManager.startRunning();
 
         Log.d(TAG, "running manager started");
 
@@ -95,8 +98,8 @@ public class RunningIntentService extends IntentService {
 
         final RemoteViews contentView = new RemoteViews(
                 getPackageName(), R.layout.notification_small);
-        contentView.setTextViewText(R.id.textview_notify_dist, runningManager.getDistance());
-        contentView.setTextViewText(R.id.textview_notify_time, runningManager.getRunTime());
+        contentView.setTextViewText(R.id.textview_notify_dist, RunningManager.getDistance());
+        contentView.setTextViewText(R.id.textview_notify_time, RunningManager.getRunTime());
 
         Log.d(TAG, "contentview set");
 
@@ -125,9 +128,9 @@ public class RunningIntentService extends IntentService {
                     Log.d(TAG, "running thread for updating");
 
                     contentView.setTextViewText(
-                            R.id.textview_notify_dist, runningManager.getDistance());
+                            R.id.textview_notify_dist, RunningManager.getDistance());
                     contentView.setTextViewText(
-                            R.id.textview_notify_time, runningManager.getRunTime());
+                            R.id.textview_notify_time, RunningManager.getRunTime());
 
                     notificationManager.notify(NOTIFICATION_ID, notification);
 
@@ -138,6 +141,7 @@ public class RunningIntentService extends IntentService {
                     }
                 }
 
+                locationService.stopService();
                 notificationManager.cancel(NOTIFICATION_ID);
             }
         }).start();
@@ -145,7 +149,7 @@ public class RunningIntentService extends IntentService {
     }
 
     private void handleActionStop() {
-        runningManager.stopRunning();
+        RunningManager.stopRunning(this);
     }
 
     private void createNotificationChannel() {
@@ -167,6 +171,5 @@ public class RunningIntentService extends IntentService {
     @Override
     public void onCreate() {
         super.onCreate();
-        runningManager = RunningManager.getInstance(this);
     }
 }

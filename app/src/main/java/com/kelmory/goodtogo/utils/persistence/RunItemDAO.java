@@ -1,4 +1,4 @@
-package com.kelmory.goodtogo.running.persistence;
+package com.kelmory.goodtogo.utils.persistence;
 
 import androidx.room.Dao;
 import androidx.room.Delete;
@@ -12,7 +12,7 @@ public interface RunItemDAO {
     @Query("SELECT * FROM run_history")
     List<RunTableItem> listAll();
 
-    @Query("SELECT * FROM run_history WHERE runStartTime > :required_time")
+    @Query("SELECT * FROM run_history WHERE runStartTime >= :required_time")
     List<RunTableItem> listRecent(long required_time);
 
     @Insert
@@ -23,4 +23,5 @@ public interface RunItemDAO {
 
     @Query("DELETE FROM run_history")
     void deleteAll();
+
 }

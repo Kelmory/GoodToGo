@@ -1,5 +1,6 @@
 package com.kelmory.goodtogo.musicPlayer;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
@@ -95,14 +96,16 @@ public class MusicFragment extends Fragment {
     }
 
     private void updateMusicViewInfo() {
-        if(musicPlaying != null) {
-            TextView name = mView.findViewById(R.id.textview_file_name);
-            name.setText(musicPlaying.getName());
+        if(mView != null) {
+            if (musicPlaying != null) {
+                TextView name = mView.findViewById(R.id.textview_file_name);
+                name.setText(musicPlaying.getName());
 
-            textViewProgress = mView.findViewById(R.id.textview_progress);
-            textViewProgress.setText(String.format("00:00/%s", musicPlaying.getDurationStr()));
+                textViewProgress = mView.findViewById(R.id.textview_progress);
+                textViewProgress.setText(String.format("00:00/%s", musicPlaying.getDurationStr()));
+            }
+            seekBarProgress.setMax(mediaPlayer.getDuration() / 1000);
         }
-        seekBarProgress.setMax(mediaPlayer.getDuration() / 1000);
     }
 
 
@@ -189,14 +192,10 @@ public class MusicFragment extends Fragment {
                 }
 
                 @Override
-                public void onStartTrackingTouch(SeekBar seekBar) {
-
-                }
+                public void onStartTrackingTouch(SeekBar seekBar) { }
 
                 @Override
-                public void onStopTrackingTouch(SeekBar seekBar) {
-
-                }
+                public void onStopTrackingTouch(SeekBar seekBar) { }
             });
         }
     }
@@ -225,24 +224,29 @@ public class MusicFragment extends Fragment {
             }
         });
 
-        mSeekBarRunnable = new Runnable() {
-            @Override
-            public void run() {
-                int duration = mediaPlayer.getCurrentPosition() / 1000;
+        Activity activity = getActivity();
+        if (activity != null) {
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    int duration = mediaPlayer.getCurrentPosition() / 1000;
 
-                if(textViewProgress != null) {
-                    textViewProgress.setText(String.format("%s/%s",
-                            MusicItem.formatPlayTime(duration),
-                            musicPlaying.getDurationStr()));
-                }
-                if(seekBarProgress != null) {
-                    seekBarProgress.setProgress(duration);
-                }
-                mSeekBarHandler.postDelayed(this, 50);
-            }
-        };
-        mSeekBarRunnable.run();
+                    if(textViewProgress != null) {
+                        textViewProgress.setText(String.format("%s/%s",
+                                MusicItem.formatPlayTime(duration),
+                                musicPlaying.getDurationStr()));
+                    }
+                    if(seekBarProgress != null) {
+                        seekBarProgress.setProgress(duration);
+                    }
 
+                    mSeekBarHandler.postDelayed(this, 50);
+                }
+            });
+        }
+        else{
+            Log.e(TAG, "Activity null when updating music info");
+        }
         updateMusicViewInfo();
     }
 

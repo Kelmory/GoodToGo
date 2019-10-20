@@ -28,8 +28,14 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
     @Override
     public Fragment getItem(int position) {
         // getItem is called to instantiate the fragment for the given page.
-        // Return a PlaceholderFragment (defined as a static inner class below).
-        return PlaceholderFragment.newInstance(position + 1);
+        // Return a HistoryFragment (defined as a static inner class below).
+        switch (position){
+            case 1:
+                return HistoryFragment.newInstance();
+            default:
+                return CalculatorFragment.newInstance();
+        }
+
     }
 
     @Nullable

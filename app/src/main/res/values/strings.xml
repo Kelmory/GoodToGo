@@ -7,8 +7,8 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_function">FunctionActivity</string>
-    <string name="tab_text_1">Tab 1</string>
-    <string name="tab_text_2">Tab 2</string>
+    <string name="tab_text_1">CALCULATOR</string>
+    <string name="tab_text_2">HISTORY</string>
     <string name="music_path">GET_MUSIC_PATH</string>
     <string name="music_set">MUSIC_SET</string>
     <string name="single_music_to_play">SINGLE_VALUE_TO_PLAY</string>

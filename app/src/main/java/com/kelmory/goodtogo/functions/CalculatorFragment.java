@@ -1,12 +1,6 @@
 package com.kelmory.goodtogo.functions;
 
-import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,9 +9,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
-import com.kelmory.goodtogo.R;
+import androidx.fragment.app.Fragment;
 
-import org.w3c.dom.Text;
+import com.kelmory.goodtogo.R;
 
 import java.util.Locale;
 
@@ -39,22 +33,15 @@ public class CalculatorFragment extends Fragment {
     }
 
     @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.view_calculator, container, false);
 
+        // Set Views.
         editTextDist = view.findViewById(R.id.edittext_calc_dist);
         timePicker = view.findViewById(R.id.timepicker_calc);
+
+        // Set time picker as 00:00;
         timePicker.setIs24HourView(true);
         timePicker.setHour(0);
         timePicker.setMinute(0);
@@ -66,9 +53,13 @@ public class CalculatorFragment extends Fragment {
         buttonCalc.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Time in min, and distance in km for calculation.
                 double distInKm = 1.0;
+
+                // Get time directly from time picker.
                 int timeInMin = timePicker.getHour() * 60 + timePicker.getMinute();
 
+                // Get distance from edit text
                 try {
                     String distStr = editTextDist.getText().toString();
                     distInKm = Double.parseDouble(distStr);
@@ -79,6 +70,7 @@ public class CalculatorFragment extends Fragment {
                 double speed = (distInKm * 1000) / (timeInMin * 60);
                 double pace = timeInMin / distInKm;
 
+                // Update text view upon finished.
                 textViewSpeed.setText(String.format(Locale.ENGLISH, "%.2f", speed));
                 textViewPace.setText(String.format(Locale.ENGLISH, "%.2f", pace));
             }

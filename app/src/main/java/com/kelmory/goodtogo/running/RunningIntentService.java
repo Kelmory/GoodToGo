@@ -13,7 +13,6 @@ import android.widget.RemoteViews;
 import android.widget.Toast;
 
 import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.kelmory.goodtogo.R;
@@ -68,6 +67,7 @@ public class RunningIntentService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
+        // When intent passed in, set action by it.
         if (intent != null) {
             final String action = intent.getAction();
             if (ACTION_START_RUN.equals(action)) {

@@ -4,11 +4,9 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.icu.text.SimpleDateFormat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -21,7 +19,6 @@ import com.kelmory.goodtogo.utils.persistence.RunItemDB;
 import com.kelmory.goodtogo.utils.persistence.RunTableItem;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.Locale;
 
@@ -35,15 +32,18 @@ public class HistoryAdapter extends RecyclerView.Adapter {
     HistoryAdapter(Context context){
         mContext = context;
         runTableItems = null;
+
+        // Get history data from database as soon as instantiated.
         RunItemDB db = RunItemDB.getDatabase(context);
+
+        // Using listener pattern to catch result when it is done in other threads.
         DatabaseManipulation.retrieveData(db);
         DatabaseManipulation.setListener(new DatabaseManipulation.OnDataRetrievedListener() {
             @Override
             public void onDataRetrieved(ArrayList<RunTableItem> runs) {
                 runTableItems = runs;
 
-                Log.d(TAG, "Num of run items: " + runTableItems.size());
-
+                // Notify adapter to fit the list.
                 HistoryAdapter.this.notifyDataSetChanged();
             }
         });
@@ -53,21 +53,25 @@ public class HistoryAdapter extends RecyclerView.Adapter {
                 new DatabaseManipulation.OnWeeklyRetrievedListener() {
                     @Override
                     public void onWeeklyRetrieved(ArrayList<RunTableItem> runs) {
+                        // Update weekly data.
                         runTableWeekly = runs;
                     }
                 });
     }
 
     public void clear() {
+        // Clear both list in memory and data in storage.
         runTableItems.clear();
         RunItemDB db = RunItemDB.getDatabase(mContext);
         DatabaseManipulation.deleteAll(db);
     }
 
     public String getWeeklyDist() {
+        // Set default string for empty history.
         if(runTableWeekly == null || runTableWeekly.isEmpty())
             return "----";
         else{
+            // Add up dist in meter, then format.
             double dist = 0.0;
             for(RunTableItem item : runTableWeekly){
                 dist += item.getDistance();
@@ -84,13 +88,14 @@ public class HistoryAdapter extends RecyclerView.Adapter {
         if(runTableWeekly == null || runTableWeekly.isEmpty())
             return "----";
         else{
+            // Add up time as well.
             double dist = 0.0;
             double time = 0.0;
             for(RunTableItem item : runTableWeekly){
                 dist += item.getDistance();
                 time += item.getRunTime();
             }
-
+            // Pace in min/km requires these calculation.
             double pace = (time / 60)/ (dist / 1000);
 
             return String.format(Locale.ENGLISH,
@@ -106,6 +111,7 @@ public class HistoryAdapter extends RecyclerView.Adapter {
         TextView textViewRunPace;
         ImageButton imageButtonDelete;
 
+        // View holder pattern for each element in recycler view.
         HistoryViewHolder(@NonNull View itemView) {
             super(itemView);
             textViewRunStartTime = itemView.findViewById(R.id.textview_history_single_start);
@@ -122,14 +128,16 @@ public class HistoryAdapter extends RecyclerView.Adapter {
     public HistoryViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.cardview_history_single_run, parent, false);
-
+        // Return the inflated and set view.
         return new HistoryViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, final int position) {
+        // Get item on certain position.
         RunTableItem runItem = runTableItems.get(position);
 
+        // Set all formats and values for single record.
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String dateStr = format.format(new Date(runItem.getRunStartTime()));
 
@@ -158,6 +166,7 @@ public class HistoryAdapter extends RecyclerView.Adapter {
         ((HistoryViewHolder) holder).textViewRunSpeed.setText(speedStr);
         ((HistoryViewHolder) holder).textViewRunPace.setText(paceStr);
 
+        // Set click listener for deleting an item.
         ((HistoryViewHolder) holder).imageButtonDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -167,7 +176,7 @@ public class HistoryAdapter extends RecyclerView.Adapter {
                         .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-
+                                // Remove item in both database and list.
                                 RunItemDB db = RunItemDB.getDatabase(mContext);
                                 DatabaseManipulation.deleteSingleData(
                                         db, runTableItems.get(position));
@@ -179,7 +188,7 @@ public class HistoryAdapter extends RecyclerView.Adapter {
                         .setNegativeButton("No", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                ;
+                                ; // Do nothing when negative button clicked.
                             }
                         });
                 builder.create().show();

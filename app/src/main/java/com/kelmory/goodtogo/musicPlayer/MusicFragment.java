@@ -6,11 +6,6 @@ import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-
 import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,11 +14,12 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 
 import com.kelmory.goodtogo.R;
-
-import org.w3c.dom.Text;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -86,7 +82,7 @@ public class MusicFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.view_music, container, false);
-        // Record textview_progress for updating progress
+        // Record text view progress for updating progress
         textViewProgress = view.findViewById(R.id.textview_progress);
         //
         mView = view;
@@ -95,6 +91,7 @@ public class MusicFragment extends Fragment {
         return view;
     }
 
+    // Update names, set initial information.
     private void updateMusicViewInfo() {
         if(mView != null) {
             if (musicPlaying != null) {
@@ -118,7 +115,7 @@ public class MusicFragment extends Fragment {
         }
         else {
             Log.d(TAG, "Musics loaded: " + musics.size());
-
+            // If musics exist, set music player to prepare the first.
             setMusic(FIRST_MUSIC);
         }
     }
@@ -128,6 +125,7 @@ public class MusicFragment extends Fragment {
         imageButtonList.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Start a pop-up activity and get result position for a music list.
                 Intent intent = new Intent(getActivity(),
                         MusicListPopupActivity.class);
                 intent.putParcelableArrayListExtra(getString(R.string.music_set), musics);
@@ -139,9 +137,14 @@ public class MusicFragment extends Fragment {
         imageButtonPrev.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Set music index in a circular way
                 musicIndex = (musicIndex - 1) < 0 ? musics.size() - 1 : musicIndex - 1;
                 setMusic(musicIndex);
+
+                // Play music right after switch.
                 mediaPlayer.start();
+
+                // Update UI for hints.
                 imageButtonPlay.setImageResource(R.drawable.ic_pause_black_36dp);
             }
         });
@@ -151,6 +154,7 @@ public class MusicFragment extends Fragment {
         imageButtonNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Set music index in another circular pattern.
                 musicIndex = (musicIndex + 1) % musics.size();
                 setMusic(musicIndex);
                 mediaPlayer.start();
@@ -162,6 +166,7 @@ public class MusicFragment extends Fragment {
         imageButtonPlay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Update media player status and UI.
                 if(!mediaPlayer.isPlaying()){
                     mediaPlayer.start();
                     imageButtonPlay.setImageResource(R.drawable.ic_pause_black_36dp);
@@ -190,7 +195,7 @@ public class MusicFragment extends Fragment {
                                 musicPlaying.getDurationStr()));
                     }
                 }
-
+                // Empty methods but asked for implementation.
                 @Override
                 public void onStartTrackingTouch(SeekBar seekBar) { }
 
@@ -206,24 +211,30 @@ public class MusicFragment extends Fragment {
             // Release MediaPlayer
             mediaPlayer.release();
         }
-
+        // Reset music index;
         musicIndex = index;
+        // Get music with position and information list
         musicPlaying = musics.get(index);
         File musicFileToPlay = new File(musicPlaying.getPath());
+
+        // Set up media player.
         mediaPlayer = MediaPlayer.create(getContext(), Uri.fromFile(musicFileToPlay));
         mediaPlayer.seekTo(0);
 
+        // Set listener for play completion.
         mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
+                // Release resources relevant to playing one.
                 mp.release();
                 mSeekBarHandler.removeCallbacks(mSeekBarRunnable);
-
+                // Switch to next music.
                 setMusic(musicIndex + 1);
                 mediaPlayer.start();
             }
         });
 
+        // Setup another runnable component for updating progress of music.
         Activity activity = getActivity();
         if (activity != null) {
             activity.runOnUiThread(new Runnable() {
@@ -247,17 +258,20 @@ public class MusicFragment extends Fragment {
         else{
             Log.e(TAG, "Activity null when updating music info");
         }
+        // Update information after another music set.
         updateMusicViewInfo();
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        // Receive music position from pop-up list activity.
         if (requestCode == MUSIC_POSITION_REQUEST_CODE){
             if(resultCode == RESULT_OK){
                 try {
                     int position = data.getIntExtra(
                             getResources().getString(R.string.str_music_position), musicIndex);
                     if (position != musicIndex){
+                        // Set music player for another music.
                         setMusic(position);
                         imageButtonPlay.setImageResource(R.drawable.ic_pause_black_36dp);
                         mediaPlayer.start();

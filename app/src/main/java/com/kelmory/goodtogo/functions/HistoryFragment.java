@@ -52,6 +52,7 @@ public class HistoryFragment extends Fragment {
             Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.view_history, container, false);
 
+        // Initialize with text views inflated with data.
         textViewWeeklyPace = root.findViewById(R.id.textview_report_pace);
         textViewWeeklyDist = root.findViewById(R.id.textview_report_dist);
 
@@ -74,6 +75,7 @@ public class HistoryFragment extends Fragment {
                         .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
+                                // Clear data and update view.
                                 historyAdapter.clear();
                                 historyAdapter.notifyDataSetChanged();
                                 textViewWeeklyPace.setText(historyAdapter.getWeeklyPace());
@@ -83,6 +85,7 @@ public class HistoryFragment extends Fragment {
                         .setNegativeButton("No", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
+                                // Update view for insurance.
                                 textViewWeeklyPace.setText(historyAdapter.getWeeklyPace());
                                 textViewWeeklyDist.setText(historyAdapter.getWeeklyDist());
                             }

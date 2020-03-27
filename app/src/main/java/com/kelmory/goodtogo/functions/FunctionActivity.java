@@ -18,9 +18,11 @@ public class FunctionActivity extends AppCompatActivity {
         SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(
                 this, getSupportFragmentManager());
 
+        // Use view pager to present different segments;
         ViewPager viewPager = findViewById(R.id.view_pager);
         viewPager.setAdapter(sectionsPagerAdapter);
 
+        // Use tab layout to show tab names
         TabLayout tabs = findViewById(R.id.tabs);
         tabs.setupWithViewPager(viewPager);
 

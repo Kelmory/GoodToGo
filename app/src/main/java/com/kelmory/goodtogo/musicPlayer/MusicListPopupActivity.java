@@ -15,28 +15,18 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.kelmory.goodtogo.MainActivity;
 import com.kelmory.goodtogo.R;
 
 import java.util.ArrayList;
 
 public class MusicListPopupActivity extends Activity {
 
-    public interface onMusicPositionSetListener{
-        void onMusicPositionSet(int position);
-    }
-
-    private static onMusicPositionSetListener musicPositionSetListener;
-
-    public static void setMusicPositionSetListener(onMusicPositionSetListener listener) {
-        musicPositionSetListener = listener;
-    }
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pop_up_list);
 
+        // Set this activity to a window-like form.
         DisplayMetrics dm = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(dm);
 
@@ -47,6 +37,7 @@ public class MusicListPopupActivity extends Activity {
 
         ArrayList<MusicItem> musics = getIntent().getParcelableArrayListExtra(getResources().getString(R.string.music_set));
 
+        // Set up recycler view for listing musics.
         RecyclerView recyclerView = findViewById(R.id.recyclerview_music_list);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
@@ -56,6 +47,7 @@ public class MusicListPopupActivity extends Activity {
         musicAdapter.setOnItemClickListener(new MusicAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
+                // Send data with position.
                 Intent data = new Intent();
                 data.putExtra(getResources().getString(R.string.str_music_position), position);
                 setResult(RESULT_OK, data);

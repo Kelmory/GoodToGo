@@ -6,6 +6,7 @@ import android.os.Parcelable;
 
 import java.util.Locale;
 
+// Implementing parcelable to make this class feasible to be transmitted by intent;
 class MusicItem implements Parcelable {
     private String mName;
     private String mPath;
@@ -15,6 +16,7 @@ class MusicItem implements Parcelable {
         mPath = path;
         mName = name;
 
+        // Get duration of a music
         MediaMetadataRetriever retriever = new MediaMetadataRetriever();
         retriever.setDataSource(mPath);
         String duration = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
